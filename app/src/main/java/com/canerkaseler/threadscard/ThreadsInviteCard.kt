@@ -1,11 +1,16 @@
 package com.canerkaseler.threadscard
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,6 +30,9 @@ fun ThreadsInviteCard() {
     // This is our custom value of Axis-Y on coordinate system.
     var axisY by remember { mutableStateOf(0f) }
 
+    // Manage auto-turning animation.
+    var isAutomaticAnimationActive by remember { mutableStateOf(true) }
+
     ThreadsInviteCardHolder (
         frontSide = {
             CardFrontSide(user = User())
@@ -32,7 +40,28 @@ fun ThreadsInviteCard() {
         backSide = {
             CardBackSide()
         },
-        positionAxisY = axisY,
+        positionAxisY = if (isAutomaticAnimationActive) {
+            val automaticTurningAnimation = remember { Animatable(axisY) } // Auto-turning animation.
+
+            LaunchedEffect(isAutomaticAnimationActive) {
+                if (isAutomaticAnimationActive) {
+                    automaticTurningAnimation.animateTo(
+                        targetValue = if (axisY >= 0) {
+                            axisY + 360f // Turn right.
+                        } else {
+                            - 360f + axisY // Turn left.
+                        },
+                        animationSpec = infiniteRepeatable(
+                            tween(7000, easing = FastOutSlowInEasing)
+                        ),
+                    )
+                }
+            }
+            axisY = automaticTurningAnimation.value // Do not forget to update axis-Y.
+            automaticTurningAnimation.value // Finally, return animation value.
+        } else {
+            axisY
+        },
         modifier = Modifier
             .padding(
                 horizontal = 48.dp,
@@ -41,10 +70,10 @@ fun ThreadsInviteCard() {
             .pointerInput(Unit) {
                 detectHorizontalDragGestures(
                     onDragStart = { offset ->
-
+                        isAutomaticAnimationActive = false // Stop animation.
                     },
                     onDragEnd = {
-
+                        isAutomaticAnimationActive = false // Stop animation.
                     },
                     onDragCancel = {
 
