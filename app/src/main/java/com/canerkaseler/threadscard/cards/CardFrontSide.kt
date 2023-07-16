@@ -100,8 +100,6 @@ fun CardContent(
         modifier = Modifier
     ) {
 
-        Spacer(modifier = Modifier.height(spaceBetweenItems))
-
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
