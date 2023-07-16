@@ -3,6 +3,7 @@ package com.canerkaseler.threadscard
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
@@ -34,6 +35,10 @@ fun ThreadsInviteCard() {
     // Manage animations.
     var isAutomaticAnimationActive by remember { mutableStateOf(true) }
     var isCompletingAnimationActive by remember { mutableStateOf(false) }
+    var isQuickDragAnimationActive by remember { mutableStateOf(false) }
+
+    // Follow drag amount to manage QuickDragAnimation.
+    var animationDragAmount by remember { mutableStateOf(0f) }
 
     ThreadsInviteCardHolder (
         frontSide = {
@@ -90,6 +95,30 @@ fun ThreadsInviteCard() {
             axisY = completeTurningAnimation.value
             completeTurningAnimation.value
         }
+        else if (isQuickDragAnimationActive) {
+            val completeQuickDragAnimation = remember { Animatable(axisY) }
+
+            LaunchedEffect(isQuickDragAnimationActive) {
+                if (isQuickDragAnimationActive) {
+
+                    val completeTurningAnimationState = completeQuickDragAnimation.animateTo(
+                        targetValue = if (animationDragAmount > 0) {
+                            360f * 2
+                        } else {
+                            -360f * 2
+                        },
+                        animationSpec = tween(1250, easing = LinearEasing)
+                    ).endState
+
+                    if (!completeTurningAnimationState.isRunning) {
+                        isQuickDragAnimationActive = false
+                        isAutomaticAnimationActive = true
+                    }
+                }
+            }
+            axisY = completeQuickDragAnimation.value
+            completeQuickDragAnimation.value
+        }
         else {
             axisY
         },
@@ -105,8 +134,18 @@ fun ThreadsInviteCard() {
                         isCompletingAnimationActive = false // Stop animation.
                     },
                     onDragEnd = {
-                        isAutomaticAnimationActive = false // Stop animation.
-                        isCompletingAnimationActive = true // Start animation.
+
+                        // Stop animations.
+                        isAutomaticAnimationActive = false
+                        isCompletingAnimationActive = false
+                        isQuickDragAnimationActive = false
+
+                        // If user did not drag enough, just show completing animation.
+                        if (abs(animationDragAmount) > 12f) {
+                            isQuickDragAnimationActive = true
+                        } else {
+                            isCompletingAnimationActive = true
+                        }
                     },
                     onDragCancel = {
 
@@ -119,6 +158,8 @@ fun ThreadsInviteCard() {
                         } else {
                             (axisY + abs(dragAmount)) % 360 // Turn right for positive numbers.
                         }
+
+                        animationDragAmount = dragAmount // Keep updated drag amount.
                     }
                 )
             },
