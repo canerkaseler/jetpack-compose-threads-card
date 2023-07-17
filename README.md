@@ -1,8 +1,8 @@
-![final_400](https://github.com/canerkaseler/jetpack-compose-threads-card/assets/130801186/61e57b14-fa2d-483c-8acf-bf000e1f1060)
+![final_400](https://github.com/canerkaseler/jetpack-compose-threads-card/assets/130801186/b4d271c7-74f3-465c-8cd5-a0e58bd74d7f)
 
 # Threads Invitation Card with Jetpack Compose
 
-![threads_medium_ck 2](https://github.com/canerkaseler/jetpack-compose-threads-card/assets/130801186/be15e0c2-5b9b-4dd2-9fa1-ddd5892ca002)
+![threads_medium_ck 2](https://github.com/canerkaseler/jetpack-compose-threads-card/assets/130801186/2652db5e-0092-4ab3-9705-aadc41e0a668)
 
 
 This repository targets to show Threads Card animation with Jetpack Compose in android development.
